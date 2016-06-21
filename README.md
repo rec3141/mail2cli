@@ -1,2 +1,2 @@
 # mail2cli
-run shell commands from an email attachment 
+run shell commands from the body of an email or an attachment 
