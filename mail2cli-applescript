@@ -1,0 +1,36 @@
+using terms from application "Mail"
+	on perform mail action with messages theselectedMessages for rule theRule
+		tell application "Mail"
+			repeat with theMessage in theselectedMessages
+				set read status of theMessage to true
+				
+				set file_path to "Users:USERNAME:Downloads:mail2cli:mail2cli.sh" -- replace USERNAME
+				set pos_path to quoted form of (POSIX path of file_path)
+				set theContent to content of theMessage
+				--display dialog theContent
+				
+				try
+					do shell script "echo  " & quoted form of theContent & " >  " & pos_path
+				end try
+				
+				do shell script "cd ~/Downloads/mail2cli;"
+				do shell script "chmod +x " & pos_path & ";"
+				do shell script pos_path & " | head -c 2000000 > " & pos_path & "-output.txt;"
+				
+				set msg to reply theMessage without opening window
+				delay 0.1
+				try
+					set content of msg to do shell script "cat " & pos_path & "-output.txt;"
+				end try
+				send msg
+				
+				do shell script "mv " & pos_path & " " & pos_path & "-input-$(date +%Y%m%d%s)"
+				do shell script "mv " & pos_path & "-output.txt " & pos_path & "-output-$(date +%Y%m%d%s)"
+				
+			end repeat
+		end tell
+	end perform mail action with messages
+end using terms from
+
+
+-- (path to home folder) gives sandboxed Macintosh HD:Users:USERNAME:Library:Containers:com.apple.mail:Data:
